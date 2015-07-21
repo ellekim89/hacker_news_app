@@ -8,4 +8,11 @@ class ApplicationController < ActionController::Base
     def current_user
     @current_user ||= User.find_by_id(session[:user_id])
     end
+
+    def is_authenticated?
+    unless @current_user
+      flash[:danger] = 'Please create an account for access.'
+      redirect_to signup_path
+    end
+  end
 end

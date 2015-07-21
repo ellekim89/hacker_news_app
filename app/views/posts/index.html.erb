@@ -1,0 +1,7 @@
+<h3> My Posts </h3>
+
+<ul>
+<%= @post.each do |p| %>
+  <li><%= p.title %> ( <%= p.link %> ) </li>
+  <% end %>
+</ul>

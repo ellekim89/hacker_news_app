@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+
+  before_action :is_authenticated?, except: [:new, :create]
   def new
 
   end
@@ -9,7 +11,7 @@ class SessionsController < ApplicationController
     if user
       session[:user_id] = user.id
       flash[:success] = 'You are logged in.'
-      redirect_to root_path
+      redirect_to posts_path
 
     else
 
