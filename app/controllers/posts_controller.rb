@@ -1,9 +1,16 @@
 class PostsController < ApplicationController
 
-  before_action :is_authenticated?
+  before_action :check_auth, except: [:index]
+  before_action :load_model, only:[:edit,:update,:destroy]
+  before_action :check_ownership, only: [:edit,:update,:destroy]
 
   def index
-    @post = @current_user.posts
+    @posts = Post.all
+    respond_to do |format|
+      format.html
+      format.json {render json: @posts}
+      format.xml {render xml: @posts}
+    end
   end
 
   def new
@@ -11,15 +18,40 @@ class PostsController < ApplicationController
   end
 
   def create
-    @current_user.posts.create posts_params
-    redirect_to posts_path
+    @post = current_user.posts.create post_params
+    if @post.persisted?
+      flash[:success] = "Your link has been posted."
+      redirect_to root_path
+    else
+      flash[:danger] = @post.errors.full_messages.uniq.to_sentence
+      render :new
+    end
   end
 
-private
-  def posts_params
+  def edit
+  end
+
+  def update
+    @post.update post_params
+    if @post.save
+      flash[:success] = "Your link has been updated."
+      redirect_to root_path
+    else
+      flash[:danger] = @post.errors.full_messages.uniq.to_sentence
+      render :edit
+    end
+
+  end
+
+  def destroy
+    @post.delete
+    render json:{}
+  end
+
+  private
+
+  def post_params
     params.require(:post).permit(:title,:link)
-
   end
-
 
 end
